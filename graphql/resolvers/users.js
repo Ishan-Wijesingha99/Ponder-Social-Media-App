@@ -78,6 +78,11 @@ module.exports = {
     login: async (_, {email, password}) => {
       const { errors, valid } = validateLoginInput(email, password)
 
+      // validate form data
+      if(!valid) throw new UserInputError('Errors', { errors })
+
+      
+
       // check if user exists
       const user = await User.findOne({ email })
 
