@@ -4,21 +4,12 @@ const gql = require('graphql-tag') // installed with apollo-server npm package
 
 const mongoose = require('mongoose')
 
+const Post = require('./models/Post')
+
+const typeDefs = require('./graphql/typeDefs')
+const resolvers = require('./graphql/resolvers')
 
 
-const typeDefs = gql`
-  type Query {
-    sayHi: String!
-
-  }
-
-`
-
-const resolvers = {
-  Query: {
-    sayHi: () => 'Hi There'
-  }
-}
 
 
 const server = new ApolloServer({ typeDefs, resolvers })
