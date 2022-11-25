@@ -3,7 +3,7 @@ require('dotenv').config()
 
 const jwt = require('jsonwebtoken')
 
-const { authenticationError, AuthenticationError } = require('apollo-server')
+const { AuthenticationError } = require('apollo-server')
 
 
 
