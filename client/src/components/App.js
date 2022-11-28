@@ -2,6 +2,12 @@ import React from 'react';
 
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
 
+import { BrowserRouter as Router, Route} from 'react-router-dom'
+
+import 'semantic-ui-css/semantic.min.css'
+import { Home } from '../pages/Home';
+import { Login } from '../pages/Login';
+import { Register } from '../pages/Register';
 
 
 
@@ -25,9 +31,11 @@ const client = new ApolloClient({
 export const App = () => {
   return (
     <ApolloProvider client={client}>
-      <div>
-        Yeet
-      </div>
+      <Router>
+        <Route exact path='/' component={<Home />}/>
+        <Route exact path='/login' component={<Login />}/>
+        <Route exact path='/register' component={<Register />}/>
+      </Router>
     </ApolloProvider>
   )
 }
