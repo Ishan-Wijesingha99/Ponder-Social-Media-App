@@ -2,7 +2,7 @@ const Post = require('../../models/Post')
 
 const checkAuth = require('../../utils/checkAuth')
 
-const { AuthenticationError } = require('apollo-server')
+const { AuthenticationError, UserInputError } = require('apollo-server')
 
 
 
@@ -58,7 +58,7 @@ module.exports = {
       const user = checkAuth(context)
 
       try {
-        
+
         // get the post the user is trying to delete from the Post model/collection
         const post = await Post.findById(postId)
 
@@ -77,6 +77,39 @@ module.exports = {
         throw new Error(error)
       }
 
+    },
+    likePost: async (_, { postId }, context) => {
+      // check if user is logged in, if they aren't, an error will be returned which was written into the checkAuth function itself. If user is logged in, we will get the returned object from the checkAuth function
+      const user = checkAuth(context)
+
+      // check if post exists from the postId and throw an error if it doesn't exist
+      const post = await Post.findById(postId)
+
+      if(!post) throw new UserInputError('Post not found')
+
+      // if you reach this line of code, the post does exist, so now we can go about liking it or unliking it
+
+      // look through the entire likes array in the post document and see if you find a likesObject in that likes array that has a username property that matches the username of the user currently logged in
+      if(post.likes.find(likeObject => likeObject.username === user.username)) {
+        // for this code block to be executed, the .find() above must have returned an object, which is truthy
+        
+        // this means the user has already liked this post, so we need to unlike it
+        // filter out the likeObject that has a username property that matches the username of the logged in user
+        post.likes = post.likes.filter(likeObject => likeObject.username !== user.username) 
+      } else {
+        // for this code block to be executed, the .find() above must have returned undefined, which is falsy
+
+        // in that case, user has not liked this post, so we need to like it
+        post.likes.push({
+          username: user.username,
+          createdAt: Date.now()
+        })
+      }
+
+      // whether the user liked the post or unliked it, we must save that change to the model
+      await post.save()
+
+      return post
     }
   }
 
