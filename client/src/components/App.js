@@ -2,9 +2,7 @@ import React from 'react';
 
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
 
-import { BrowserRouter as Router, Route, Switch} from 'react-router-dom'
-
-import { Container, Search } from 'semantic-ui-react';
+import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 
 import 'semantic-ui-css/semantic.min.css'
 
@@ -32,20 +30,21 @@ const client = new ApolloClient({
 // if the queries and mutations from the backend work, you know the client has been successfully connected to the server
 
 
+
 export const App = () => {
   return (
     <ApolloProvider client={client}>
+
       <Router>
-        <>
-          <MenuBar />
-          
-          <Switch>
-            <Route exact path='/' component={Search}/>
-            <Route exact path='/login' component={Login}/>
-            <Route exact path='/register' component={Register}/>
-          </Switch> 
-        </>
+        <MenuBar />
+
+        <Routes>
+          <Route path='/' element={<Home />}/>
+          <Route path='/login' element={<Login />}/>
+          <Route path='/register' element={<Register />}/>
+        </Routes>
       </Router>
+      
     </ApolloProvider>
   )
 }
