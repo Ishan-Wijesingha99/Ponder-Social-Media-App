@@ -2,12 +2,16 @@ import React from 'react';
 
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
 
-import { BrowserRouter as Router, Route} from 'react-router-dom'
+import { BrowserRouter as Router, Route, Switch} from 'react-router-dom'
+
+import { Container, Search } from 'semantic-ui-react';
 
 import 'semantic-ui-css/semantic.min.css'
+
 import { Home } from '../pages/Home';
 import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
+import { MenuBar } from './MenuBar';
 
 
 
@@ -32,9 +36,15 @@ export const App = () => {
   return (
     <ApolloProvider client={client}>
       <Router>
-        <Route exact path='/' component={<Home />}/>
-        <Route exact path='/login' component={<Login />}/>
-        <Route exact path='/register' component={<Register />}/>
+        <>
+          <MenuBar />
+          
+          <Switch>
+            <Route exact path='/' component={Search}/>
+            <Route exact path='/login' component={Login}/>
+            <Route exact path='/register' component={Register}/>
+          </Switch> 
+        </>
       </Router>
     </ApolloProvider>
   )

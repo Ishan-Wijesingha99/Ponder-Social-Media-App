@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { Menu, Segment } from 'semantic-ui-react'
+import { Menu } from 'semantic-ui-react'
 
 
 
@@ -10,28 +10,27 @@ export const MenuBar = () => {
 
   return (
     <Menu pointing secondary>
+      
       <Menu.Item
         name='home'
         active={activeItem === 'home'}
-        onClick={this.handleItemClick}
+        onClick={handleItemClick}
       />
-      <Menu.Item
-        name='messages'
-        active={activeItem === 'messages'}
-        onClick={this.handleItemClick}
-      />
-      <Menu.Item
-        name='friends'
-        active={activeItem === 'friends'}
-        onClick={this.handleItemClick}
-      />
+
       <Menu.Menu position='right'>
         <Menu.Item
-          name='logout'
-          active={activeItem === 'logout'}
-          onClick={this.handleItemClick}
+          name='login'
+          active={activeItem === 'login'}
+          onClick={handleItemClick}
+        />
+
+        <Menu.Item
+          name='register'
+          active={activeItem === 'register'}
+          onClick={handleItemClick}
         />
       </Menu.Menu>
+
     </Menu>
   )
 }
