@@ -45,8 +45,12 @@ export const Register = () => {
 
   // the update function will be triggered if the mutation is successful
   const [addUser, { loading }] = useMutation(REGISTER_USER, {
-    update(proxy, result) {
+    update(_, result) {
+      // if addUser() was successful, then log the result to the console
       console.log(result)
+      
+      // if addUser() was successful, then change the url to home page
+      window.location.href = '/'
     },
     onError(err) {
       setErrors(err.graphQLErrors[0].extensions.fields)
@@ -91,6 +95,7 @@ export const Register = () => {
           placeholder="Username..."
           name="username"
           value={formData.username}
+          error={errors.username ? true : false}
           onChange={changeFormData}
         />
 
@@ -100,6 +105,7 @@ export const Register = () => {
           placeholder="Email..."
           name="email"
           value={formData.email}
+          error={errors.email ? true : false}
           onChange={changeFormData}
         />
 
@@ -109,6 +115,7 @@ export const Register = () => {
           placeholder="Password..."
           name="password"
           value={formData.password}
+          error={errors.password ? true : false}
           onChange={changeFormData}
         />
 
@@ -118,6 +125,7 @@ export const Register = () => {
           placeholder="Confirm Password..."
           name="confirmPassword"
           value={formData.confirmPassword}
+          error={errors.confirmPassword ? true : false}
           onChange={changeFormData}
         />
 
