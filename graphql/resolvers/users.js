@@ -37,7 +37,9 @@ module.exports = {
       // validate form data, this is where we check if the username has already been taken, if the password and confirmPassword matches, if the email is the correct form using a Regex expression etc etc
       const { valid, errors } = validateRegisterInput(username, email, password, confirmPassword)
 
-      if(!valid) throw new UserInputError('Errors', { errors })
+      if(!valid) throw new UserInputError('Errors', { 
+        fields: errors
+      })
 
 
 
@@ -45,7 +47,7 @@ module.exports = {
       const user = await User.findOne({ username })
 
       if(user) throw new UserInputError('Username is taken', {
-        errors: {
+        fields: {
           username: 'This username is taken'
         }
       })
@@ -79,7 +81,9 @@ module.exports = {
       const { errors, valid } = validateLoginInput(email, password)
 
       // validate form data
-      if(!valid) throw new UserInputError('Errors', { errors })
+      if(!valid) throw new UserInputError('Errors', {
+        fields: errors 
+      })
 
       
 
@@ -88,7 +92,9 @@ module.exports = {
 
       if(!user) {
         errors.general = 'User not found'
-        throw new UserInputError('Email not found in our database', { errors })
+        throw new UserInputError('Email not found in our database', { 
+          fields: errors 
+        })
       }
 
       // after we first check if the exists in our database, we can then compare the password the user typed in to the password in the database
@@ -96,7 +102,9 @@ module.exports = {
 
       if(!correctPassword) {
         errors.general = 'Wrong password'
-        throw new UserInputError('Wrong password', { errors })
+        throw new UserInputError('Wrong password', { 
+          fields: errors 
+        })
       }
 
       // if we get to this point in the code, the email and password are correct, and the user can be logged in

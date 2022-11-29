@@ -34,6 +34,8 @@ const REGISTER_USER = gql`
 
 
 export const Register = () => {
+  const [errors, setErrors] = useState({})
+
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -45,6 +47,10 @@ export const Register = () => {
   const [addUser, { loading }] = useMutation(REGISTER_USER, {
     update(proxy, result) {
       console.log(result)
+    },
+    onError(err) {
+      setErrors(err.graphQLErrors[0].extensions.fields)
+      console.log(errors)
     },
     variables: formData
   })
@@ -71,11 +77,16 @@ export const Register = () => {
 
   return (
     <div className="form-container-div">
-      <Form onSubmit={onSubmit} noValidate>
+      <Form
+      onSubmit={onSubmit}
+      noValidate
+      className={loading ? 'loading' : ''}
+      >
 
         <h1>Register</h1>
 
         <Form.Input 
+          type="text"
           label="Username"
           placeholder="Username..."
           name="username"
@@ -83,7 +94,8 @@ export const Register = () => {
           onChange={changeFormData}
         />
 
-        <Form.Input 
+        <Form.Input
+          type="email"
           label="Email"
           placeholder="Email..."
           name="email"
@@ -114,6 +126,23 @@ export const Register = () => {
         </Button>
 
       </Form>
+
+      {
+        Object.keys(errors).length > 0 && (
+
+          <div className="ui error message">
+            <ul className="list">
+
+              {Object.values(errors).map(errorString => (
+                <li key={errorString}>{errorString}</li>
+              ))}
+              
+            </ul>
+          </div>
+
+        )
+      }
+
     </div>
   )
 }
