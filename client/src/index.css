@@ -3,3 +3,10 @@
   margin-left: 40px;
   margin-right: 40px;
 }
+
+#page-title {
+  display: block;
+  text-align: center;
+  font-size: 2rem;
+  margin-top: 10px;
+}

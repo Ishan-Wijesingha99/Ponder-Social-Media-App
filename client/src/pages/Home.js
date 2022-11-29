@@ -45,7 +45,7 @@ export const Home = () => {
   return (
     <Grid columns={3}>
 
-      <Grid.Row>
+      <Grid.Row id="page-title">
         <h1>Recent Posts</h1>
       </Grid.Row>
 

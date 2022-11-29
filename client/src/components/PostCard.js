@@ -4,21 +4,24 @@ import { Card, Icon, Label, Image, Button } from 'semantic-ui-react'
 
 import moment from 'moment'
 
+import { Link } from "react-router-dom";
+
 
 
 export const PostCard = ({ postObject: { body, createdAt, id, username, likeCount, commentCount, likes }}) => {
 
-  // we need to convert the Date.now() time, which is just the unix time, to the format shown in the tutorial video
-  console.log(createdAt)
-  // const date1 = new Date(createdAt)
-  // console.log(date1)
-  // console.log(new Date(createdAt).toISOString())
-  // console.log(createdAt.toISOString())
+  const likePost = () => {
+    console.log('Post liked!')
+  }
+
+  const commentOnPost = () => {
+    console.log('Post commented on!')
+  }
 
 
 
   return (
-    <Card>
+    <Card fluid>
 
       <Card.Content>
         <Image
@@ -29,7 +32,12 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
 
         <Card.Header>{username}</Card.Header>
 
-        <Card.Meta>{moment(createdAt).fromNow(true)}</Card.Meta>
+        <Card.Meta
+          as={Link}
+          to={`/posts/${id}`}
+        >
+          {moment.unix(createdAt/1000).fromNow()}
+        </Card.Meta>
 
         <Card.Description>
           {body}
@@ -37,8 +45,46 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
 
       </Card.Content>
 
+
+
       <Card.Content extra>
-        <p>buttons here</p>
+
+        {/* like button section */}
+        <Button
+          as='div'
+          labelPosition='right'
+          onClick={likePost}
+        >
+
+          <Button color='teal' basic>
+            <Icon name='heart' />
+            Like
+          </Button>
+          
+          <Label basic color='teal' pointing='left'>
+            {likeCount}
+          </Label>
+
+        </Button>
+
+        {/* comment button section */}
+        <Button
+          as='div'
+          labelPosition='right'
+          onClick={commentOnPost}
+        >
+
+          <Button color='blue' basic>
+            <Icon name='comments' />
+            Comment
+          </Button>
+          
+          <Label basic color='blue' pointing='left'>
+            {commentCount}
+          </Label>
+
+        </Button>
+
       </Card.Content>
 
     </Card>
