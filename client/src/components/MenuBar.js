@@ -6,12 +6,19 @@ import { Link } from 'react-router-dom'
 
 
 export const MenuBar = () => {
-  const [activeItem, setActiveItem] = useState('')
+  
+  const pathName = window.location.pathname
+  
+  const path = pathName === '/' ? 'home' : pathName.substring(1)
+
+  const [activeItem, setActiveItem] = useState('home')
+
+
 
   const handleItemClick = (e, { name }) => setActiveItem(name)
 
   return (
-    <Menu pointing secondary>
+    <Menu pointing secondary size='massive' color='teal'>
 
       <Menu.Item
         name='home'

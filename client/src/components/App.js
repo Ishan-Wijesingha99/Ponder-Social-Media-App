@@ -36,15 +36,17 @@ export const App = () => {
     <ApolloProvider client={client}>
 
       <Router>
-        <MenuBar />
+        <div className='wrapper-div'>
+          <MenuBar />
 
-        <Routes>
-          <Route path='/' element={<Home />}/>
-          <Route path='/login' element={<Login />}/>
-          <Route path='/register' element={<Register />}/>
-        </Routes>
+          <Routes>
+            <Route path='/' element={<Home />}/>
+            <Route path='/login' element={<Login />}/>
+            <Route path='/register' element={<Register />}/>
+          </Routes>
+        </div>
       </Router>
-      
+
     </ApolloProvider>
   )
 }
