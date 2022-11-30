@@ -9,6 +9,8 @@ import { AuthContext } from "../context/auth";
 
 import { useNavigate } from "react-router-dom";
 
+import { AlreadyLoggedIn } from "../components/AlreadyLoggedIn";
+
 
 
 const REGISTER_USER = gql`
@@ -38,6 +40,10 @@ const REGISTER_USER = gql`
 
 
 export const Register = (props) => {
+
+  // even when you are logged in, the user can still type /register or /login in the url and access those pages, we need to make sure they can't access these pages
+  // this can be easily solved by conditionally rendering the register form, if the user is logged in, do not render the form
+
   const context = useContext(AuthContext)
 
   const navigate = useNavigate()
@@ -93,60 +99,79 @@ export const Register = (props) => {
 
   return (
     <div className="form-container-div">
-      <Form
-      onSubmit={onSubmit}
-      noValidate
-      className={loading ? 'loading' : ''}
-      >
+      
+      {
+        // render form if token exists in local storage, render button to take user back to homepage if not
+        localStorage.getItem('token')
 
-        <h1>Register</h1>
+        ?
 
-        <Form.Input 
-          type="text"
-          label="Username"
-          placeholder="Username..."
-          name="username"
-          value={formData.username}
-          error={errors.username ? true : false}
-          onChange={changeFormData}
-        />
+        (
+          <AlreadyLoggedIn />
+        )
 
-        <Form.Input
-          type="email"
-          label="Email"
-          placeholder="Email..."
-          name="email"
-          value={formData.email}
-          error={errors.email ? true : false}
-          onChange={changeFormData}
-        />
+        :
 
-        <Form.Input
-          type="password"
-          label="Password"
-          placeholder="Password..."
-          name="password"
-          value={formData.password}
-          error={errors.password ? true : false}
-          onChange={changeFormData}
-        />
+        (
+          <Form
+          onSubmit={onSubmit}
+          noValidate
+          className={loading ? 'loading' : ''}
+          >
 
-        <Form.Input
-          type="password"
-          label="Confirm Password"
-          placeholder="Confirm Password..."
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          error={errors.confirmPassword ? true : false}
-          onChange={changeFormData}
-        />
+            <h1>Register</h1>
 
-        <Button type="submit" primary>
-          Register
-        </Button>
+            <Form.Input 
+              type="text"
+              label="Username"
+              placeholder="Username..."
+              name="username"
+              value={formData.username}
+              error={errors.username ? true : false}
+              onChange={changeFormData}
+            />
 
-      </Form>
+            <Form.Input
+              type="email"
+              label="Email"
+              placeholder="Email..."
+              name="email"
+              value={formData.email}
+              error={errors.email ? true : false}
+              onChange={changeFormData}
+            />
 
+            <Form.Input
+              type="password"
+              label="Password"
+              placeholder="Password..."
+              name="password"
+              value={formData.password}
+              error={errors.password ? true : false}
+              onChange={changeFormData}
+            />
+
+            <Form.Input
+              type="password"
+              label="Confirm Password"
+              placeholder="Confirm Password..."
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              error={errors.confirmPassword ? true : false}
+              onChange={changeFormData}
+            />
+
+            <Button type="submit" primary>
+              Register
+            </Button>
+
+          </Form>
+        )
+      }
+
+
+
+      {/* this will only be rendered if there are properties in the error object, which is only possible if the form is being rendered, so you don't need to worry about this component being rendered if the form isn't also rendered */}
       {
         Object.keys(errors).length > 0 && (
 

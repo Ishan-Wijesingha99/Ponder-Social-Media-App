@@ -7,7 +7,9 @@ import { gql } from 'graphql-tag'
 
 import { AuthContext } from "../context/auth";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+
+import { AlreadyLoggedIn } from "../components/AlreadyLoggedIn";
 
 
 
@@ -32,6 +34,10 @@ const LOGIN_USER = gql`
 
 
 export const Login = (props) => {
+
+  // even when you are logged in, the user can still type /register or /login in the url and access those pages, we need to make sure they can't access these pages
+  // this can be easily solved by conditionally rendering the login form, if the user is logged in, do not render the form
+
   const context = useContext(AuthContext)
 
   const navigate = useNavigate()
@@ -86,42 +92,61 @@ export const Login = (props) => {
 
 
 
-  return (
+  return ( 
     <div className="form-container-div">
-      <Form
-      onSubmit={onSubmit}
-      noValidate
-      className={loading ? 'loading' : ''}
-      >
 
-        <h1>Login</h1>
+      {
+        // render form if token exists in local storage, render button to take user back to homepage if not
+        localStorage.getItem('token')
 
-        <Form.Input
-          type="email"
-          label="Email"
-          placeholder="Email..."
-          name="email"
-          value={formData.email}
-          error={errors.email ? true : false}
-          onChange={changeFormData}
-        />
+        ?
 
-        <Form.Input
-          type="password"
-          label="Password"
-          placeholder="Password..."
-          name="password"
-          value={formData.password}
-          error={errors.password ? true : false}
-          onChange={changeFormData}
-        />
+        (
+          <AlreadyLoggedIn />
+        )
 
-        <Button type="submit" primary>
-          Login
-        </Button>
+        :
 
-      </Form>
+        (
+          <Form
+          onSubmit={onSubmit}
+          noValidate
+          className={loading ? 'loading' : ''}
+          >
 
+            <h1>Login</h1>
+
+            <Form.Input
+              type="email"
+              label="Email"
+              placeholder="Email..."
+              name="email"
+              value={formData.email}
+              error={errors.email ? true : false}
+              onChange={changeFormData}
+            />
+
+            <Form.Input
+              type="password"
+              label="Password"
+              placeholder="Password..."
+              name="password"
+              value={formData.password}
+              error={errors.password ? true : false}
+              onChange={changeFormData}
+            />
+
+            <Button type="submit" primary>
+              Login
+            </Button>
+
+          </Form>
+        )
+      }
+
+
+
+      {/* this will only be rendered if there are properties in the error object, which is only possible if the form is being rendered, so you don't need to worry about this component being rendered if the form isn't also rendered */}
       {
         Object.keys(errors).length > 0 && (
 
