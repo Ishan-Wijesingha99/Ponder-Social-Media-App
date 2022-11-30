@@ -11,6 +11,7 @@ import { Login } from '../pages/Login';
 import { Register } from '../pages/Register';
 import { MenuBar } from './MenuBar';
 
+import { AuthProvider } from '../context/auth';
 
 
 // create apollo client in these 3 steps
@@ -35,17 +36,21 @@ export const App = () => {
   return (
     <ApolloProvider client={client}>
 
-      <Router>
-        <div className='wrapper-div'>
-          <MenuBar />
+      <AuthProvider>
 
-          <Routes>
-            <Route path='/' element={<Home />}/>
-            <Route path='/login' element={<Login />}/>
-            <Route path='/register' element={<Register />}/>
-          </Routes>
-        </div>
-      </Router>
+        <Router>
+          <div className='wrapper-div'>
+            <MenuBar />
+
+            <Routes>
+              <Route path='/' element={<Home />}/>
+              <Route path='/login' element={<Login />}/>
+              <Route path='/register' element={<Register />}/>
+            </Routes>
+          </div>
+        </Router>
+
+      </AuthProvider>
 
     </ApolloProvider>
   )

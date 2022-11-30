@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import { Button, Form } from "semantic-ui-react";
 
 import { useMutation } from "@apollo/client";
 import { gql } from 'graphql-tag'
+
+import { AuthContext } from "../context/auth";
 
 
 
@@ -34,6 +36,10 @@ const REGISTER_USER = gql`
 
 
 export const Register = () => {
+  const context = useContext(AuthContext)
+
+
+
   const [errors, setErrors] = useState({})
 
   const [formData, setFormData] = useState({
@@ -46,10 +52,14 @@ export const Register = () => {
   // the update function will be triggered if the mutation is successful
   const [addUser, { loading }] = useMutation(REGISTER_USER, {
     update(_, result) {
-      // if addUser() was successful, then log the result to the console
+      // if addUser() was successful, then execute the following code
       console.log(result)
+
+      // even though we are registering, the login function attached to the context can be used for both registering and logging in
+      context.login(result.data.register)
+
       
-      // if addUser() was successful, then change the url to home page
+      // finally, redirect to the home page by changing the url to home page
       window.location.href = '/'
     },
     onError(err) {

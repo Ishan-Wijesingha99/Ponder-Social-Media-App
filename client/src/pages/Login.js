@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 
 import { Button, Form } from "semantic-ui-react";
 
 import { useMutation } from "@apollo/client";
 import { gql } from 'graphql-tag'
+
+import { AuthContext } from "../context/auth";
 
 
 
@@ -28,6 +30,8 @@ const LOGIN_USER = gql`
 
 
 export const Login = () => {
+  const context = useContext(AuthContext)
+
   const [errors, setErrors] = useState({})
 
   const [formData, setFormData] = useState({
@@ -38,10 +42,17 @@ export const Login = () => {
   // the update function will be triggered if the mutation is successful
   const [loginUser, { loading }] = useMutation(LOGIN_USER, {
     update(_, result) {
-      // if loginUser() was successful, then log the result to the console
+      // if loginUser() was successful, then execute the following code
       console.log(result)
+
+      // use login function which is attached to the context
+      // result.data.login is the userData
+      context.login(result.data.login)
+
+
+
       
-      // if loginUser() was successful, then change the url to home page
+      // finally, redirect to the homepage by changing the url to '/'
       window.location.href = '/'
     },
     onError(err) {
