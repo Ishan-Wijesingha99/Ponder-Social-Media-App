@@ -36,6 +36,7 @@ export const App = () => {
   return (
     <ApolloProvider client={client}>
 
+      {/* every element inside the authProvider will have access to all the variables and functions we defined in the context, this is an easy way to have a global state and also global functions */}
       <AuthProvider>
 
         <Router>

@@ -7,6 +7,8 @@ import { gql } from 'graphql-tag'
 
 import { AuthContext } from "../context/auth";
 
+import { useNavigate } from "react-router-dom";
+
 
 
 const REGISTER_USER = gql`
@@ -35,10 +37,10 @@ const REGISTER_USER = gql`
 
 
 
-export const Register = () => {
+export const Register = (props) => {
   const context = useContext(AuthContext)
 
-
+  const navigate = useNavigate()
 
   const [errors, setErrors] = useState({})
 
@@ -59,8 +61,8 @@ export const Register = () => {
       context.login(result.data.register)
 
       
-      // finally, redirect to the home page by changing the url to home page
-      window.location.href = '/'
+      // finally, redirect to the homepage
+      navigate('/')
     },
     onError(err) {
       setErrors(err.graphQLErrors[0].extensions.fields)
