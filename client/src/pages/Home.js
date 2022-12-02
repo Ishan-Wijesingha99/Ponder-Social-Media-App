@@ -1,12 +1,14 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useQuery } from '@apollo/client'
 
 import { gql } from 'graphql-tag'
 
 import { Grid } from "semantic-ui-react";
 
-
 import { PostCard } from '../components/PostCard'
+import { PostForm } from '../components/PostForm'
+
+import { AuthContext } from "../context/auth";
 
 
 
@@ -35,6 +37,8 @@ const FETCH_POST_QUERY = gql`
 
 
 export const Home = () => {
+  const { user } = useContext(AuthContext)
+
   // loading is a boolean which you can use to set up a loading screen/component
   // data is an object that has only one property, the getPosts property, which is an array
   // do not deconstruct the getPosts property out of the data object, it leads to bugs
@@ -50,6 +54,14 @@ export const Home = () => {
       </Grid.Row>
 
       <Grid.Row>
+
+        {/* if the user exists, that means we are logged in, so in that case, render this form */}
+        {user && (
+          <Grid.Column>
+            <PostForm />
+          </Grid.Column>
+        )}
+
         {
           loading 
           ? 
@@ -68,6 +80,7 @@ export const Home = () => {
             ))
           )
         }
+
       </Grid.Row>
 
     </Grid>
