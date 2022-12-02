@@ -1,6 +1,7 @@
 import React from 'react';
 
 import { ApolloClient, ApolloProvider, InMemoryCache, createHttpLink } from '@apollo/client'
+import { setContext } from 'apollo-link-context'
 
 import { Route, Routes, BrowserRouter as Router } from 'react-router-dom';
 
@@ -16,20 +17,48 @@ import { AuthProvider } from '../context/auth';
 
 
 // create apollo client in these 3 steps
+
+
+
+// 1
 const httpLink = createHttpLink({
   uri: 'http://localhost:5000'
 })
 
+
+
+// 2
+// need to use apollo-link-context so that whenever you try to create a post, the jwt token that is located in localStorage is automatically sent in the Authorization header
+const authLink = setContext(() => {
+  // get the jwt token from localStorage
+  const token = localStorage.getItem('token')
+
+  // return an object that has a headers property
+  // the headers property is itself an object with an Authorization property, here we check if the token exists, if it does, then we send it in the authorization header, if not, we send an empty string 
+  return {
+    headers: {
+      Authorization: token ? `Bearer ${token}` : ''
+    }
+  }
+})
+
+
+
+// 3
 const client = new ApolloClient({
-  link: httpLink,
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache()
 })
 
 
 
-
 // if you have the chrome extention 'Apollo Client Devtools' downloaded, you'll see a tab called apollo in the chrome devtools, here you can literally execute queries and mutations just like you did in the backend
 // if the queries and mutations from the backend work, you know the client has been successfully connected to the server
+
+
+
+
+
 
 
 

@@ -43,6 +43,7 @@ export const PostForm = () => {
 
   const [createPost, { error }] = useMutation(CREATE_POST_MUTATION, {
     variables: formData,
+
     update: (_, result) => {
       // once this mutation is successful, execute the following code
 
@@ -66,7 +67,8 @@ export const PostForm = () => {
   }
 
   const handleSubmit = () => {
-
+    // when the form is submitted, use the createPost mutation
+    createPost()
   }
 
   return (
