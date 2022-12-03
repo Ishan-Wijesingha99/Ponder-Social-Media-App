@@ -12,7 +12,7 @@ import { AuthContext } from "../context/auth";
 
 
 
-const FETCH_POST_QUERY = gql`
+export const FETCH_POST_QUERY = gql`
   query {
     getPosts {
       id
