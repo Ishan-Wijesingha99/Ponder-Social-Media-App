@@ -110,30 +110,42 @@ export const PostForm = () => {
   }
 
   return (
-    <Form
-    onSubmit={handleSubmit}
-    >
+    <>
+      <Form
+      onSubmit={handleSubmit}
+      >
 
-      <h2>Create a post:</h2>
+        <h2>Create a post:</h2>
 
-      <Form.Field>
+        <Form.Field>
 
-        <Form.Input
-        placeholder="Type post here..."
-        name="body"
-        onChange={handleInputChange}
-        value={formData.body}
-        />
+          <Form.Input
+          placeholder="Type post here..."
+          name="body"
+          onChange={handleInputChange}
+          value={formData.body}
+          error={error ? true : false}
+          />
 
-        <Button
-        type="submit"
-        color="teal"
-        >
-          Submit  
-        </Button>
+          <Button
+          type="submit"
+          color="teal"
+          >
+            Submit  
+          </Button>
 
-      </Form.Field>
+        </Form.Field>
 
-    </Form>
+      </Form>
+
+      {/* this is just in case an error occurs, there is only one possible error anyway, if we try and create a post with no body */}
+      {error && (
+        <div className="ui error message" style={{ marginBottom: 20 }}>
+          <ul className="list">
+            <li>Body must not be empty</li>
+          </ul>
+        </div>
+      )}
+    </>
   )
 }

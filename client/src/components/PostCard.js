@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 
 import { Card, Icon, Label, Image, Button } from 'semantic-ui-react'
 
@@ -6,16 +6,18 @@ import moment from 'moment'
 
 import { Link } from "react-router-dom";
 
+import { AuthContext } from "../context/auth";
+
 
 
 export const PostCard = ({ postObject: { body, createdAt, id, username, likeCount, commentCount, likes }}) => {
 
+  const { user } = useContext(AuthContext)
+
+
+
   const likePost = () => {
     console.log('Post liked!')
-  }
-
-  const commentOnPost = () => {
-    console.log('Post commented on!')
   }
 
 
@@ -69,9 +71,9 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
 
         {/* comment button section */}
         <Button
-          as='div'
           labelPosition='right'
-          onClick={commentOnPost}
+          as={Link}
+          to={`/posts/${id}`}
         >
 
           <Button color='blue' basic>
@@ -84,6 +86,24 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
           </Label>
 
         </Button>
+
+        {/* delete button */}
+        {/* if user is true, we are logged in */}
+        {/* if user.username === username, that means the post belongs to the currently logged in user */}
+        {/* if both of these are true, only then render the delete button */}
+        {user && user.username === username && (
+          <Button
+          as="div"
+          color="red"
+          onClick={() => console.log('Delete post')}
+          floated="right"
+          >
+            <Icon
+            name="trash"
+            style={{ margin: 0 }}
+            />
+          </Button>
+        )}
 
       </Card.Content>
 
