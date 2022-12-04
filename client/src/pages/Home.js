@@ -12,7 +12,7 @@ import { AuthContext } from "../context/auth";
 
 
 
-export const FETCH_POST_QUERY = gql`
+export const FETCH_POSTS_QUERY = gql`
   query {
     getPosts {
       id
@@ -42,7 +42,7 @@ export const Home = () => {
   // loading is a boolean which you can use to set up a loading screen/component
   // data is an object that has only one property, the getPosts property, which is an array
   // do not deconstruct the getPosts property out of the data object, it leads to bugs
-  const { loading, data } = useQuery(FETCH_POST_QUERY)
+  const { loading, data } = useQuery(FETCH_POSTS_QUERY)
 
 
 
