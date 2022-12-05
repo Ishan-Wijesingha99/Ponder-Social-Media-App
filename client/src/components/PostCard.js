@@ -8,17 +8,13 @@ import { Link } from "react-router-dom";
 
 import { AuthContext } from "../context/auth";
 
+import { LikeButton } from './LikeButton'
+
 
 
 export const PostCard = ({ postObject: { body, createdAt, id, username, likeCount, commentCount, likes }}) => {
 
   const { user } = useContext(AuthContext)
-
-
-
-  const likePost = () => {
-    console.log('Post liked!')
-  }
 
 
 
@@ -52,22 +48,14 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
       <Card.Content extra>
 
         {/* like button section */}
-        <Button
-          as='div'
-          labelPosition='right'
-          onClick={likePost}
-        >
+        <LikeButton 
+        id={id}
+        likes={likes}
+        likeCount={likeCount}
+        user={user}
+        />
 
-          <Button color='teal' basic>
-            <Icon name='heart' />
-            Like
-          </Button>
-          
-          <Label basic color='teal' pointing='left'>
-            {likeCount}
-          </Label>
 
-        </Button>
 
         {/* comment button section */}
         <Button
@@ -86,6 +74,8 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
           </Label>
 
         </Button>
+
+
 
         {/* delete button */}
         {/* if user is true, we are logged in */}
