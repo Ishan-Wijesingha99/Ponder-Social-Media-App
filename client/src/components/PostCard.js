@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../context/auth";
 
 import { LikeButton } from './LikeButton'
+import { DeleteButton } from './DeleteButton'
 
 
 
@@ -82,17 +83,9 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
         {/* if user.username === username, that means the post belongs to the currently logged in user */}
         {/* if both of these are true, only then render the delete button */}
         {user && user.username === username && (
-          <Button
-          as="div"
-          color="red"
-          onClick={() => console.log('Delete post')}
-          floated="right"
-          >
-            <Icon
-            name="trash"
-            style={{ margin: 0 }}
-            />
-          </Button>
+          <DeleteButton
+          postId={id}
+          />
         )}
 
       </Card.Content>
