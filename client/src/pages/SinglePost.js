@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useRef, useState } from "react";
 
 import { useParams, useNavigate } from "react-router-dom";
 
@@ -171,30 +171,33 @@ export const SinglePost = (props) => {
             {/* input to add a comment */}
             {/* if user is true, that means the user is logged in, therefore this input should be rendered so that they can comment */}
             {user && (
-              <Card
-              fluid
-              >
-                <p>Post a comment</p>
-                <Form>
-                  <div className="ui action input fluid">
-                    <input 
-                    type="text"
-                    placeholder="Comment..."
-                    name="comment"
-                    value={yourComment}
-                    onChange={event => setYourComment(event.target.value)}
-                    />
+              <Card fluid>
+                <Card.Content>
 
-                    <button
-                    type="submit"
-                    className="ui button teal"
-                    disabled={yourComment.trim() === ''}
-                    onClick={createComment}
-                    >
-                      Post Comment
-                    </button>
-                  </div>
-                </Form>
+                  <p>Post a comment</p>
+
+                  <Form>
+                    <div className="ui action input fluid">
+                      <input 
+                      type="text"
+                      placeholder="Comment..."
+                      name="comment"
+                      value={yourComment}
+                      onChange={event => setYourComment(event.target.value)}
+                      />
+
+                      <button
+                      type="submit"
+                      className="ui button teal"
+                      disabled={yourComment.trim() === ''}
+                      onClick={createComment}
+                      >
+                        Post Comment
+                      </button>
+                    </div>
+                  </Form>
+
+                </Card.Content>
               </Card>
             )}
 
