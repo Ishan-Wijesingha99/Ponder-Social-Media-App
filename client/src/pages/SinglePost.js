@@ -1,5 +1,7 @@
 import React, { useContext } from "react";
 
+import { useParams, useNavigate } from "react-router-dom";
+
 import { gql } from "graphql-tag";
 
 import { useQuery } from "@apollo/client";
@@ -9,29 +11,30 @@ import { Button, Card, Grid, Image, Icon, Label } from "semantic-ui-react";
 import moment from "moment";
 
 import { LikeButton } from "../components/LikeButton";
+import { DeleteButton } from "../components/DeleteButton";
 
 import { AuthContext } from "../context/auth";
 
 
 
 const FETCH_POST_QUERY = gql`
-  query($postId: ID!) {
+  query GetPost($postId: ID!) {
     getPost(postId: $postId) {
-      id
       body
+      commentCount
+      comments {
+        body
+        createdAt
+        id
+        username
+      }
       createdAt
-      username
+      id
       likeCount
       likes {
         username
       }
-      commentCount
-      comments {
-        id
-        username
-        createdAt
-        body
-      }
+      username
     }
   }
 `
@@ -39,29 +42,30 @@ const FETCH_POST_QUERY = gql`
 
 
 export const SinglePost = (props) => {
+  const navigate = useNavigate()
   
-  const postId = props.match.params.postId
+  const { postId } = useParams()
 
   const { user } = useContext(AuthContext)
 
-
-
   const { data } = useQuery(FETCH_POST_QUERY, {
     variables: {
-      postId: postId
+      postId
     }
   })
 
-  const getPost = data.getPost
+  const deletePostCallback = () => {
+    navigate('/')
+  }
 
 
 
   let postMarkup
 
-  if(!getPost) {
+  if(!data?.getPost) {
     postMarkup = <p>Loading post...</p>
   } else {
-    const { id, body, createdAt, username, comments, likes, likeCount, commentCount } = getPost
+    const { id, body, createdAt, username, comments, likes, likeCount, commentCount } = data.getPost
 
     postMarkup = (
       <Grid>
@@ -114,6 +118,18 @@ export const SinglePost = (props) => {
                     {commentCount}
                   </Label>
                 </Button>
+
+                {/* delete button */}
+                {/* if user is true, we are logged in */}
+                {/* if user.username === username, that means the post belongs to the currently logged in user */}
+                {/* if both of these are true, only then render the delete button */}
+                {user && user.username === username && (
+                  <DeleteButton
+                  postId={id}
+                  callback={deletePostCallback}
+                  />
+                )}
+
               </Card.Content>
 
             </Card>
@@ -127,9 +143,5 @@ export const SinglePost = (props) => {
 
 
 
-  return (
-    <div>
-      
-    </div>
-  )
+  return postMarkup
 }
