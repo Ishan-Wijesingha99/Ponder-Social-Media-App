@@ -1,12 +1,12 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 
 import { useParams, useNavigate } from "react-router-dom";
 
 import { gql } from "graphql-tag";
 
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 
-import { Button, Card, Grid, Image, Icon, Label } from "semantic-ui-react";
+import { Button, Card, Grid, Image, Icon, Label, Form } from "semantic-ui-react";
 
 import moment from "moment";
 
@@ -39,6 +39,21 @@ const FETCH_POST_QUERY = gql`
   }
 `
 
+const CREATE_COMMENT_MUTATION = gql`
+  mutation($postId: ID!, $body: String!) {
+    createComment(postId: $postId, body: $body) {
+      id
+      comments {
+        id
+        body
+        createdAt
+        username
+      }
+      commentCount
+    }
+  }
+`
+
 
 
 export const SinglePost = (props) => {
@@ -48,11 +63,28 @@ export const SinglePost = (props) => {
 
   const { user } = useContext(AuthContext)
 
+  const [yourComment, setYourComment] = useState('')
+
+
+
   const { data } = useQuery(FETCH_POST_QUERY, {
     variables: {
       postId
     }
   })
+
+  const [createComment] = useMutation(CREATE_COMMENT_MUTATION, {
+    update() {
+      // once a comment has been created in the database via the CREATE_COMMENT_MUTATION, we need to reset the body of the comment input field to an empty string
+      setYourComment('')
+    },
+    variables: {
+      postId: postId,
+      body: yourComment
+    }
+  })
+
+
 
   const deletePostCallback = () => {
     navigate('/')
@@ -80,7 +112,7 @@ export const SinglePost = (props) => {
             />
           </Grid.Column>
 
-          <Grid.Column width={2}>
+          <Grid.Column width={12}>
             <Card fluid>
               <Card.Content>
                 <Card.Header>
@@ -133,6 +165,71 @@ export const SinglePost = (props) => {
               </Card.Content>
 
             </Card>
+
+
+
+            {/* input to add a comment */}
+            {/* if user is true, that means the user is logged in, therefore this input should be rendered so that they can comment */}
+            {user && (
+              <Card
+              fluid
+              >
+                <p>Post a comment</p>
+                <Form>
+                  <div className="ui action input fluid">
+                    <input 
+                    type="text"
+                    placeholder="Comment..."
+                    name="comment"
+                    value={yourComment}
+                    onChange={event => setYourComment(event.target.value)}
+                    />
+
+                    <button
+                    type="submit"
+                    className="ui button teal"
+                    disabled={yourComment.trim() === ''}
+                    onClick={createComment}
+                    >
+                      Post Comment
+                    </button>
+                  </div>
+                </Form>
+              </Card>
+            )}
+
+
+
+            {/* comment section */}
+            {comments.map(commentObject => (
+              <Card
+              fluid
+              key={commentObject.id}
+              >
+                <Card.Content>
+                  {user && user.username === commentObject.username && (
+                    <DeleteButton
+                    postId={id}
+                    commentId={commentObject.id}
+                    />
+                  )}
+
+                  <Card.Header>
+                    {commentObject.username}
+                  </Card.Header>
+
+                  <Card.Meta>
+                    {moment.unix(createdAt/1000).fromNow()}
+                  </Card.Meta>
+
+                  <Card.Description>
+                    {commentObject.body}
+                  </Card.Description>
+                </Card.Content>
+              </Card>
+            ))}
+
+
           </Grid.Column>
 
         </Grid.Row>
