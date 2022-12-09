@@ -23,7 +23,7 @@ import { AuthProvider } from '../context/auth';
 
 // 1
 const httpLink = createHttpLink({
-  uri: 'http://localhost:5000'
+  uri: 'https://stormy-forest-83840.herokuapp.com/'
 })
 
 

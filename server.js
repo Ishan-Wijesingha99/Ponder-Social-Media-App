@@ -9,7 +9,7 @@ const Post = require('./models/Post')
 const typeDefs = require('./graphql/typeDefs')
 const resolvers = require('./graphql/resolvers')
 
-
+const PORT = process.env.port || 5000
 
 
 const server = new ApolloServer({ 
@@ -21,8 +21,7 @@ const server = new ApolloServer({
 mongoose.connect('mongodb+srv://ishanwij99:yeet981@cluster0.6n9gpsy.mongodb.net/Ponder?retryWrites=true&w=majority',
 { useNewUrlParser: true })
 .then(res => console.log('Mongoose connection successful'))
-.then(() => server.listen({ port: 5000 }).then(res => console.log(`Server is running at ${res.url}`)))
-
-
+.then(() => server.listen({ port: PORT }).then(res => console.log(`Server is running at ${res.url}`)))
+.catch(error => console.error(error))
 
 
