@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React from 'react'
 
-import { Form, Button } from "semantic-ui-react";
+import gql from 'graphql-tag'
+import { useMutation } from '@apollo/react-hooks'
 
-import { gql } from "graphql-tag";
-import { useMutation } from "@apollo/client";
-
-import { FETCH_POSTS_QUERY } from "../pages/Home";
+import { useForm } from '../util/useForm'
+import { FETCH_POSTS_QUERY } from '../util/graphql'
 
 
 
@@ -37,22 +36,15 @@ const CREATE_POST_MUTATION = gql`
 
 export const PostForm = () => {
 
-  const [formData, setFormData] = useState({
+  // get information from your custom hook, useForm()
+  const { formData, onChange, onSubmit } = useForm(createPostCallback, {
     body: ''
   })
 
-
-
   const [createPost, { error }] = useMutation(CREATE_POST_MUTATION, {
     variables: formData,
-
-    update: (proxy, result) => {
+    update(proxy, result) {
       // once this mutation is successful, execute the following code
-
-      // log the result to the console so that we can see if the mutation was successful
-      console.log(result)
-
-
 
       // once the post has been created in the mongoDB database, it won't be shown on the list of posts in the home page until we refresh the page
       // the standard way to update the page without refreshing the page is the following...
@@ -69,83 +61,67 @@ export const PostForm = () => {
         query: FETCH_POSTS_QUERY
       })
 
-      // the variable data, which we got from proxy.readQuery() cannot be altered, so we need to create a new object that is the exact same as data so we can change it
-      // we can't just say const cachePostData = data because then cachePostData will still point to the same thing in the heap, need to create a totally new object using {} constructor
-      const cachePostData = { ...data }
-
       // then we add the new post to this array of posts
       // result.data.createPost is the new post
-      // ...cachePostData.getPosts are the old posts
+      // ...data.getPosts are the old posts
       // because we want to display the newest posts first, we add result.data.getPost to the start of the array
-      cachePostData.getPosts = [result.data.createPost, ...cachePostData.getPosts]
+      data.getPosts = [result.data.createPost, ...data.getPosts]
 
       // we then need to persist this change, this is how
-      proxy.writeQuery({
-        query: FETCH_POSTS_QUERY,
-        data: cachePostData
-      })
-
-
+      proxy.writeQuery({ query: FETCH_POSTS_QUERY, data })
 
       // reset the body once the post has been created and added to the mongoDB database
-      setFormData({
-        body: ''
-      })
-
+      formData.body = ''
     }
   })
 
-
-
-  const handleInputChange = event => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value
-    })
-  }
-
-  const handleSubmit = () => {
-    // when the form is submitted, use the createPost mutation
+  // need this function to be hoisted to the top, so use function declaration
+  function createPostCallback() {
     createPost()
   }
 
+
+
   return (
     <>
-      <Form
-      onSubmit={handleSubmit}
+      <form
+      onSubmit={onSubmit}
+      className="post-form"
       >
+        <h2 className='post-form-title'>Create a post:</h2>
 
-        <h2>Create a post:</h2>
+        <textarea
+        placeholder="Hi World!"
+        name="body"
+        onChange={onChange}
+        value={formData.body}
+        error={error ? true : false}
+        className='create-post-form-textarea'
+        rows="3"
+        style={{
+          resize: 'none'
+        }}
+        />
 
-        <Form.Field>
+        <button
+        type='submit'
+        className='post-form-submit-button'
+        >
+          Post
+        </button>
 
-          <Form.Input
-          placeholder="Type post here..."
-          name="body"
-          onChange={handleInputChange}
-          value={formData.body}
-          error={error ? true : false}
-          />
-
-          <Button
-          type="submit"
-          color="teal"
+        {/* this is just in case an error occurs, there is only one possible error anyway, if we try and create a post with no body */}
+        {error && (
+          <div
+          className="post-form-error-message-list"
           >
-            Submit  
-          </Button>
-
-        </Form.Field>
-
-      </Form>
-
-      {/* this is just in case an error occurs, there is only one possible error anyway, if we try and create a post with no body */}
-      {error && (
-        <div className="ui error message" style={{ marginBottom: 20 }}>
-          <ul className="list">
-            <li>Body must not be empty</li>
-          </ul>
-        </div>
-      )}
+            <p>Body must not be empty</p>
+          </div>
+        )}
+      </form>
     </>
   )
 }
+
+
+

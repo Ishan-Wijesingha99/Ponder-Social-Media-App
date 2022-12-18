@@ -1,82 +1,59 @@
-import React, { useContext } from "react";
-
-import { Card, Icon, Label, Image, Button } from 'semantic-ui-react'
+import React, { useContext } from 'react'
+import { Link } from 'react-router-dom'
+import { FaComments } from 'react-icons/fa'
 
 import moment from 'moment'
 
-import { Link } from "react-router-dom";
-
-import { AuthContext } from "../context/auth";
-
+import { AuthContext } from '../context/auth'
 import { LikeButton } from './LikeButton'
 import { DeleteButton } from './DeleteButton'
 
 
 
-export const PostCard = ({ postObject: { body, createdAt, id, username, likeCount, commentCount, likes }}) => {
-
+export const PostCard = ({ post: { body, createdAt, id, username, likeCount, commentCount, likes } }) => {
+  
   const { user } = useContext(AuthContext)
 
 
 
   return (
-    <Card fluid>
+    <div className='postcard'>
+      <p className='postcard-username'>{username}</p>
 
-      <Card.Content>
-        <Image
-          floated='right'
-          size='mini'
-          src='https://react.semantic-ui.com/images/avatar/large/molly.png'
-        />
+      <Link
+      to={`/posts/${id}`}
+      className="postcard-time-link"
+      >
+        <p className='postcard-time'>{moment.unix(createdAt/1000).fromNow()}</p>
+      </Link>
 
-        <Card.Header>{username}</Card.Header>
+      <span className='postcard-span'></span>
 
-        <Card.Meta
-          as={Link}
+      <p className='postcard-body'>{body}</p>
+
+      <span className='postcard-span'></span>
+
+      <div className='postcard-button-section'>
+        <div className='like-and-comment-buttons'>
+          {/* like button */}
+          <LikeButton
+          user={user}
+          post={{ id, likes, likeCount }}
+          />
+
+          {/* comment button */}
+          <Link
           to={`/posts/${id}`}
-        >
-          {moment.unix(createdAt/1000).fromNow()}
-        </Card.Meta>
+          className="comment-like-button-link"
+          >
+            <FaComments
+            size={25}
+            color='black'
+            />
 
-        <Card.Description>
-          {body}
-        </Card.Description>
-
-      </Card.Content>
-
-
-
-      <Card.Content extra>
-
-        {/* like button section */}
-        <LikeButton 
-        id={id}
-        likes={likes}
-        likeCount={likeCount}
-        user={user}
-        />
-
-
-
-        {/* comment button section */}
-        <Button
-          labelPosition='right'
-          as={Link}
-          to={`/posts/${id}`}
-        >
-
-          <Button color='blue' basic>
-            <Icon name='comments' />
-            Comment
-          </Button>
-          
-          <Label basic color='blue' pointing='left'>
-            {commentCount}
-          </Label>
-
-        </Button>
-
-
+            <p className='comment-button-commentCount'>{commentCount}</p>
+          </Link>
+        </div>
 
         {/* delete button */}
         {/* if user is true, we are logged in */}
@@ -88,8 +65,8 @@ export const PostCard = ({ postObject: { body, createdAt, id, username, likeCoun
           />
         )}
 
-      </Card.Content>
-
-    </Card>
+      </div>
+    </div>
   )
 }
+

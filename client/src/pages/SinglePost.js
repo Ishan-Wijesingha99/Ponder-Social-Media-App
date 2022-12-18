@@ -1,46 +1,19 @@
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useState } from 'react'
+import { FaComments } from 'react-icons/fa'
 
-import { useParams, useNavigate } from "react-router-dom";
+import gql from 'graphql-tag'
+import { useQuery, useMutation } from '@apollo/react-hooks'
 
-import { gql } from "graphql-tag";
+import moment from 'moment'
 
-import { useMutation, useQuery } from "@apollo/client";
-
-import { Button, Card, Grid, Image, Icon, Label, Form } from "semantic-ui-react";
-
-import moment from "moment";
-
-import { LikeButton } from "../components/LikeButton";
-import { DeleteButton } from "../components/DeleteButton";
-
-import { AuthContext } from "../context/auth";
+import { AuthContext } from '../context/auth'
+import { LikeButton } from '../components/LikeButton'
+import { DeleteButton } from '../components/DeleteButton'
 
 
 
-const FETCH_POST_QUERY = gql`
-  query GetPost($postId: ID!) {
-    getPost(postId: $postId) {
-      body
-      commentCount
-      comments {
-        body
-        createdAt
-        id
-        username
-      }
-      createdAt
-      id
-      likeCount
-      likes {
-        username
-      }
-      username
-    }
-  }
-`
-
-const CREATE_COMMENT_MUTATION = gql`
-  mutation($postId: ID!, $body: String!) {
+const SUBMIT_COMMENT_MUTATION = gql`
+  mutation($postId: String!, $body: String!) {
     createComment(postId: $postId, body: $body) {
       id
       comments {
@@ -54,194 +27,216 @@ const CREATE_COMMENT_MUTATION = gql`
   }
 `
 
+const FETCH_POST_QUERY = gql`
+  query($postId: ID!) {
+    getPost(postId: $postId) {
+      id
+      body
+      createdAt
+      username
+      likeCount
+      likes {
+        username
+      }
+      commentCount
+      comments {
+        id
+        username
+        createdAt
+        body
+      }
+    }
+  }
+`
 
 
-export const SinglePost = (props) => {
-  const navigate = useNavigate()
-  
-  const { postId } = useParams()
+
+export const SinglePost = props => {
+
+  const postId = props.match.params.postId
 
   const { user } = useContext(AuthContext)
 
-  const [yourComment, setYourComment] = useState('')
+  const [comment, setComment] = useState('')
 
-
-
-  const { data } = useQuery(FETCH_POST_QUERY, {
+  const { data: { getPost } } = useQuery(FETCH_POST_QUERY, {
     variables: {
       postId
     }
   })
 
-  const [createComment] = useMutation(CREATE_COMMENT_MUTATION, {
+
+
+  const [createComment] = useMutation(SUBMIT_COMMENT_MUTATION, {
     update() {
       // once a comment has been created in the database via the CREATE_COMMENT_MUTATION, we need to reset the body of the comment input field to an empty string
-      setYourComment('')
+      setComment('')
     },
     variables: {
-      postId: postId,
-      body: yourComment
+      postId,
+      body: comment
     }
   })
 
 
 
-  const deletePostCallback = () => {
-    navigate('/')
+  const onSubmitFunction = event => {
+    // prevent the default reloading of the page
+    event.preventDefault()
+
+    // create comment in backend
+    createComment()
+  }
+
+  function deletePostCallback() {
+    props.history.push('/')
   }
 
 
 
   let postMarkup
 
-  if(!data?.getPost) {
-    postMarkup = <p>Loading post...</p>
+  if (!getPost) {
+    postMarkup = <p id='single-post-loading'>Loading post..</p>
   } else {
-    const { id, body, createdAt, username, comments, likes, likeCount, commentCount } = data.getPost
+
+    const { id, body, createdAt, username, comments, likes, likeCount, commentCount } = getPost
 
     postMarkup = (
-      <Grid>
+      <div className='single-post-container'>
+        <div className='postcard'>
 
-        <Grid.Row>
+          <p className='postcard-username'>{username}</p>
 
-          <Grid.Column width={2}>
-            <Image
-            src="https://react.semantic-ui.com/images/avatar/large/molly.png"
-            size="small"
-            float="right"
+          <p className='postcard-time'>{moment.unix(createdAt/1000).fromNow()}</p>
+
+          <span className='postcard-span'></span>
+
+          <p className='postcard-body'>{body}</p>
+
+          <span className='postcard-span'></span>
+
+          <div className='postcard-button-section'>
+
+            {/* like button */}
+            <LikeButton
+            user={user}
+            post={{ id, likeCount, likes }}
             />
-          </Grid.Column>
+            
+            {/* comment button */}
+            <div
+            className="comment-like-button-link"
+            onClick={() => document.querySelector('.create-comment-textarea').focus()}
+            >
+              <FaComments
+              size={25}
+              color='black'
+              />
 
-          <Grid.Column width={12}>
-            <Card fluid>
-              <Card.Content>
-                <Card.Header>
-                  {username}
-                </Card.Header>
-                <Card.Meta>
-                  {moment.unix(createdAt/1000).fromNow()}
-                </Card.Meta>
-                <Card.Description>
-                  {body}
-                </Card.Description>
-              </Card.Content>
+              <p
+              className='comment-button-commentCount'
+              >
+                {commentCount}
+              </p>
+            </div>
 
-              <hr />
-
-              <Card.Content extra>
-                {/* like button */}
-                <LikeButton
-                user={user}
-                id={id}
-                likeCount={likeCount}
-                likes={likes}
-                />
-
-                {/* comment button */}
-                <Button
-                as="div"
-                labelPosition="right"
-                onClick={() => console.log('comment on post')}
-                >
-                  <Button basic>
-                    <Icon name="comments" />
-                  </Button>
-                  <Label basic color="blue" pointing="left">
-                    {commentCount}
-                  </Label>
-                </Button>
-
-                {/* delete button */}
-                {/* if user is true, we are logged in */}
-                {/* if user.username === username, that means the post belongs to the currently logged in user */}
-                {/* if both of these are true, only then render the delete button */}
-                {user && user.username === username && (
-                  <DeleteButton
-                  postId={id}
-                  callback={deletePostCallback}
-                  />
-                )}
-
-              </Card.Content>
-
-            </Card>
-
-
-
-            {/* input to add a comment */}
-            {/* if user is true, that means the user is logged in, therefore this input should be rendered so that they can comment */}
-            {user && (
-              <Card fluid>
-                <Card.Content>
-
-                  <p>Post a comment</p>
-
-                  <Form>
-                    <div className="ui action input fluid">
-                      <input 
-                      type="text"
-                      placeholder="Comment..."
-                      name="comment"
-                      value={yourComment}
-                      onChange={event => setYourComment(event.target.value)}
-                      />
-
-                      <button
-                      type="submit"
-                      className="ui button teal"
-                      disabled={yourComment.trim() === ''}
-                      onClick={createComment}
-                      >
-                        Post Comment
-                      </button>
-                    </div>
-                  </Form>
-
-                </Card.Content>
-              </Card>
+            {/* delete button */}
+            {/* if user is true, we are logged in */}
+            {/* if user.username === username, that means the post belongs to the currently logged in user */}
+            {/* if both of these are true, only then render the delete button */}
+            {user && user.username === username && (
+              <DeleteButton
+              postId={id}
+              callback={deletePostCallback}
+              />
             )}
 
+          </div>
 
+        </div>
+        
+        {/* post comment section */}
+        {/* if user is true, that means the user is logged in, therefore this input should be rendered so that they can comment */}
+        {user && (
+          <div className='write-comment-section'>
 
-            {/* comment section */}
-            {comments.map(commentObject => (
-              <Card
-              fluid
-              key={commentObject.id}
+            <p id='post-comment-title'>Post a comment</p>
+
+            <form className='post-comment-form'>
+
+              <textarea
+                type="text"
+                placeholder="Comment..."
+                name="comment"
+                value={comment}
+                onChange={(event) => setComment(event.target.value)}
+                className="create-comment-textarea"
+                rows="4"
+                style={{
+                  resize: 'none'
+                }}
+              />
+
+              <button
+                type="submit"
+                className="form-submit-button"
+                disabled={comment.trim() === ''}
+                onClick={onSubmitFunction}
               >
-                <Card.Content>
-                  {user && user.username === commentObject.username && (
-                    <DeleteButton
-                    postId={id}
-                    commentId={commentObject.id}
-                    />
-                  )}
+                Submit
+              </button>
 
-                  <Card.Header>
-                    {commentObject.username}
-                  </Card.Header>
+            </form>
 
-                  <Card.Meta>
-                    {moment.unix(createdAt/1000).fromNow()}
-                  </Card.Meta>
+          </div>
+        )}
+        
+        {/* all comments section */}
+        <div className='comments-section'>
 
-                  <Card.Description>
-                    {commentObject.body}
-                  </Card.Description>
-                </Card.Content>
-              </Card>
-            ))}
+          {
+          comments.map(comment => (
+            <div
+            className='individual-comment'
+            key={comment.id}
+            >
 
+              <p id='comment-username'>{comment.username}</p>
 
-          </Grid.Column>
+              <p id='comment-time'>{moment.unix(createdAt/1000).fromNow()}</p>
 
-        </Grid.Row>
+              <span className='postcard-span'></span>
 
-      </Grid>
+              <p id='comment-body'>{comment.body}</p>
+
+              <span
+              className='postcard-span'
+              id='last-comment-span'
+              ></span>
+
+              {user && user.username === comment.username && (
+
+                <DeleteButton
+                postId={id}
+                commentId={comment.id}
+                />
+
+              )
+              }
+
+            </div>
+          ))
+          }
+
+        </div>
+
+      </div>
     )
   }
 
-
-
   return postMarkup
 }
+
+
+

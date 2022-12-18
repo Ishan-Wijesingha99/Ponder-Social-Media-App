@@ -1,24 +1,23 @@
 {
-  "name": "solo-project-1",
+  "name": "client",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@apollo/client": "^3.7.1",
-    "@testing-library/jest-dom": "^5.16.4",
-    "@testing-library/react": "^13.3.0",
-    "@testing-library/user-event": "^13.5.0",
-    "apollo-link-context": "^1.0.20",
-    "graphql": "^16.6.0",
-    "graphql-tag": "^2.12.6",
-    "jwt-decode": "^3.1.2",
-    "moment": "^2.29.4",
-    "react": "^18.1.0",
-    "react-dom": "^18.1.0",
-    "react-router-dom": "^6.4.3",
-    "react-scripts": "5.0.1",
-    "semantic-ui-css": "^2.5.0",
-    "semantic-ui-react": "^2.1.4",
-    "web-vitals": "^2.1.4"
+    "@apollo/react-hooks": "0.1.0-beta.7",
+    "apollo-cache-inmemory": "^1.6.2",
+    "apollo-client": "^2.6.2",
+    "apollo-link-context": "^1.0.18",
+    "apollo-link-http": "^1.5.14",
+    "graphql": "^14.3.1",
+    "graphql-tag": "^2.10.1",
+    "jwt-decode": "^2.2.0",
+    "moment": "^2.24.0",
+    "react": "^16.8.6",
+    "react-confirm-alert": "^2.8.0",
+    "react-dom": "^16.8.6",
+    "react-icons": "^4.7.1",
+    "react-router-dom": "^5.1.2",
+    "react-scripts": "3.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -27,10 +26,7 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
+    "extends": "react-app"
   },
   "browserslist": {
     "production": [
@@ -43,5 +39,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "https://pacific-brushlands-99720.herokuapp.com/"
 }

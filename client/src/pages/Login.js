@@ -1,27 +1,17 @@
-import React, { useState, useContext } from "react";
+import React, { useContext, useState } from 'react'
 
-import { Button, Form } from "semantic-ui-react";
+import { useMutation } from '@apollo/react-hooks'
+import gql from 'graphql-tag'
 
-import { useMutation } from "@apollo/client";
-import { gql } from 'graphql-tag'
-
-import { AuthContext } from "../context/auth";
-
-import { useNavigate, Link } from "react-router-dom";
-
-import { AlreadyLoggedIn } from "../components/AlreadyLoggedIn";
+import { AuthContext } from '../context/auth'
+import { useForm } from '../util/useForm'
+import { AlreadyLoggedIn } from '../components/AlreadyLoggedIn'
 
 
 
 const LOGIN_USER = gql`
-  mutation login(
-    $email: String!
-    $password: String!
-  ) {
-    login(
-      email: $email,
-      password: $password,
-    ) {
+  mutation login($username: String!, $password: String!) {
+    login(username: $username, password: $password) {
       id
       email
       username
@@ -33,70 +23,48 @@ const LOGIN_USER = gql`
 
 
 
-export const Login = (props) => {
-
-  // even when you are logged in, the user can still type /register or /login in the url and access those pages, we need to make sure they can't access these pages
-  // this can be easily solved by conditionally rendering the login form, if the user is logged in, do not render the form
+export const Login = props => {
 
   const context = useContext(AuthContext)
 
-  const navigate = useNavigate()
-
   const [errors, setErrors] = useState({})
 
-  const [formData, setFormData] = useState({
-    email: '',
+  const { onChange, onSubmit, formData } = useForm(loginUserCallback, {
+    username: '',
     password: ''
   })
 
   // the update function will be triggered if the mutation is successful
   const [loginUser, { loading }] = useMutation(LOGIN_USER, {
-    update(_, result) {
+    update(_, { data: { login: userData } }) {
       // if loginUser() was successful, then execute the following code
-      console.log(result)
 
       // use login function which is attached to the context
-      // result.data.login is the userData
-      context.login(result.data.login)
+      context.login(userData)
 
-
-
-      
       // finally, redirect to the homepage
-      navigate('/')
+      props.history.push('/')
     },
     onError(err) {
-      setErrors(err.graphQLErrors[0].extensions.fields)
-      console.log(errors)
+      setErrors(err.graphQLErrors[0].extensions.exception.errors)
     },
     variables: formData
   })
 
 
 
-  const changeFormData = event => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value
-    })
-  }
-
-  const onSubmit = event => {
-    event.preventDefault()
-
-    // no need to validate form data because we've already done server side validation, no point validating on the client as well
-
-    // so just use the addUser mutation
+  // need function to be hoisted, so use function declaration
+  function loginUserCallback() {
     loginUser()
   }
 
 
 
-  return ( 
-    <div className="form-container-div">
+  return (
+    <div className='form-container'>
 
       {
-        // render form if token exists in local storage, render button to take user back to homepage if not
+        // render form if token doesn't exist in local storage, render button to take user back to homepage if it already exists
         localStorage.getItem('token')
 
         ?
@@ -108,61 +76,82 @@ export const Login = (props) => {
         :
 
         (
-          <Form
+          <form
           onSubmit={onSubmit}
           noValidate
-          className={loading ? 'loading' : ''}
+          className='login-form'
           >
 
-            <h1>Login</h1>
+            <h1 className='login-form-title'>Login</h1>
 
-            <Form.Input
-              type="email"
-              label="Email"
-              placeholder="Email..."
-              name="email"
-              value={formData.email}
-              error={errors.email ? true : false}
-              onChange={changeFormData}
+            <label
+            htmlFor="Username"
+            className='input-label'
+            >
+              Username
+            </label>
+            <input
+            className='login-input-field'
+            type="text"
+            label="Username"
+            placeholder="Username..."
+            name="username"
+            value={formData.username}
+            error={errors.username ? true : false}
+            onChange={onChange}
             />
 
-            <Form.Input
-              type="password"
-              label="Password"
-              placeholder="Password..."
-              name="password"
-              value={formData.password}
-              error={errors.password ? true : false}
-              onChange={changeFormData}
+            <label
+            htmlFor="Password"
+            className='input-label'
+            >
+              Password
+            </label>
+            <input
+            className='login-input-field'
+            label="Password"
+            placeholder="Password..."
+            name="password"
+            type="password"
+            value={formData.password}
+            error={errors.password ? true : false}
+            onChange={onChange}
             />
 
-            <Button type="submit" primary>
+            <button
+            type='submit'
+            className='form-submit-button'
+            >
               Login
-            </Button>
+            </button>
 
-          </Form>
+          </form>
         )
+
       }
 
-
+      {/* when form is submitted, render this element while loading */}
+      { loading && (
+        <div className='loading-form-submission'>Loading...</div>
+      )}
 
       {/* this will only be rendered if there are properties in the error object, which is only possible if the form is being rendered, so you don't need to worry about this component being rendered if the form isn't also rendered */}
       {
-        Object.keys(errors).length > 0 && (
-
-          <div className="ui error message">
-            <ul className="list">
-
-              {Object.values(errors).map(errorString => (
-                <li key={errorString}>{errorString}</li>
-              ))}
-              
-            </ul>
-          </div>
-
-        )
+      Object.keys(errors).length > 0 && (
+        <ul className="error-message-list">
+          {Object.values(errors).map(error => (
+            <li
+            key={error}
+            className="error-message-li"
+            >
+              {error}
+            </li>
+          ))}
+        </ul>
+      )
       }
 
     </div>
   )
 }
+
